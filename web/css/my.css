@@ -1,0 +1,106 @@
+* {     
+	box-sizing: border-box;
+}       
+
+html, body {
+	margin: 0;
+	font-family: 'Avenir', Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	transition: opacity 0.2s;
+}
+.input-content .file-chooser {
+	margin: 0 0 5px 0px;
+}
+.json-input {
+	border: none;
+	resize: none;
+	border-bottom: 1px solid lightgray;
+	padding: 10px 30px;
+	width: 100%;
+	height: 200px;
+}
+.json-tree {
+	padding: 10px 30px;
+}
+.output-content {
+	z-index: 1;
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 40px;
+	box-shadow: 0 0 5px gray;
+}
+.json-output {
+	height: 100%;
+	width: 100%;
+	padding: 0 20px;
+	border: none;
+	font-family: monospace;
+}
+
+/* Syntax highlighting for JSON objects */
+ul.json-dict, ol.json-array {
+  list-style-type: none;
+  margin: 0 0 0 1px;
+  border-left: 1px dotted #ccc;
+  padding-left: 2em;
+}
+.json-string {
+  color: #0B7500;
+}
+.json-literal {
+  color: #1A01CC;
+  font-weight: bold;
+}
+
+/* Toggle button */
+a.json-toggle {
+  position: relative;
+  color:;
+  text-decoration: none;
+}
+a.json-toggle:focus {
+  outline: none;
+}
+a.json-toggle:before {
+  color: #aaa;
+  content: "\25BC"; /* down arrow */
+  position: absolute;
+  display: inline-block;
+  width: 1em;
+  left: -1em;
+}
+a.json-toggle.collapsed:before {
+  content: "\25B6"; /* left arrow */
+}
+
+/* Collapsable placeholder links */
+a.json-placeholder {
+  color: #aaa;
+  padding: 0 1em;
+  text-decoration: none;
+}
+a.json-placeholder:hover {
+  text-decoration: underline;
+}
+
+/* Copy path icon */
+.pick-metric {
+  color: blue;
+  cursor: pointer;
+  margin-left: 3px;
+}
+
+.pick-metric:hover {
+  color: darkgray;
+}
+
+table.metrics-table, tr.metric-row, tr.metric-row-header, th.metric-column-header, td.metric-column {
+	border-collapse:collapse;
+	border: 1px solid black;
+}
+th.metric-column-header, td.metric-column {
+	min-width: 20px;
+}

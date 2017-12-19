@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>json-metrics</title>
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	    <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="css/my.css">
+	</head>
+	<body>
+		<h1>JSON Metrics</h1>
+		<div class="file-chooser">
+		<input type="file" id="json-metric-data">
+		</div>
+		<br>
+		<div class="content" style="display: none;">
+			<h2>Metric Definitions</h2>
+			<div class="input-content">
+				<pre id="json-metric-defs-renderer" class="json-tree" class="json-metric-defs-renderer"></pre>
+			</div>
+			<h2>Metric Data</h2>
+			<div class="input-content">
+				<pre id="json-metric-data-renderer" class="json-tree" class="json-metric-data-renderer"></pre>
+			</div>
+			<div class="output-content">
+				<input id="json-output" class="json-output" type="text">
+			</div>
+		</div>
+	</body>
+	<script src="js/my.js"></script>
+</html>
+
