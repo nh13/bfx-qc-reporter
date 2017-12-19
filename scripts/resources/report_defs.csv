@@ -1,0 +1,21 @@
+Alignment Summary Metrics,PAIR,pf_reads,Total Reads
+Alignment Summary Metrics,PAIR,pct_pf_reads_aligned,Total Reads Aligned
+Alignment Summary Metrics,PAIR,pf_mismatch_rate,Mismatch Rate
+Alignment Summary Metrics,PAIR,pf_hq_error_rate,HQ Error Rate
+Alignment Summary Metrics,PAIR,pf_indel_rate,Indel Rate
+Alignment Summary Metrics,PAIR,pct_reads_aligned_in_pairs,% Reads Aligned in Pairs
+Alignment Summary Metrics,PAIR,pct_chimeras,% Chimeras (>100Kb)
+Alignment Summary Metrics,PAIR,pct_adapter,% Adapter
+Duplication Metrics (Pre-Mapping),None,percent_duplication,Duplication Rate (Pre-Mapping)
+Duplication Metrics (Pre-Mapping),None,estimated_library_size,Estimated Library Size (Pre-Mapping)
+Duplication Metrics (Post-Mapping),None,percent_duplication,Duplication Rate (Post-Mapping)
+Duplication Metrics (Post-Mapping),None,estimated_library_size,Estimated Library Size (Post-Mapping)
+Gc Bias Summary Metrics,None,at_dropout,AT Dropout
+Gc Bias Summary Metrics,None,gc_dropout,GC Dropout
+Insert Size Metrics,FR,median_insert_size,Median Insert Size
+Insert Size Metrics,FR,median_absolute_deviation,Median Insert Size Absolute Deviation
+#WGS Metrics,WHOLE_GENOME,mean_coverage,Mean Coverage
+#WGS Metrics,NON_ZERO_REGIONS,mean_coverage,Mean Non-Zero Coverage
+#WGS Metrics,WHOLE_GENOME,pct_1x,% Coverage at 1x
+#WGS Metrics,WHOLE_GENOME,pct_5x,% Coverage at 5x
+#WGS Metrics,WHOLE_GENOME,pct_10x,% Coverage at 10x

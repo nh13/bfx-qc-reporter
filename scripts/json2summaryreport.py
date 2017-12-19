@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import re
+import argparse
+from collections import OrderedDict
+import json
+from util.parser import *
+
+description="""
+A tool to produce a summary report from a JSON produced by metrics2json.py.
+
+# The Metrics to Report
+
+The --report-defs option specifies the path to the report definitions, 
+comma-delimited. Each line should contain four values: 
+1. The name of the metric group
+2. The category
+3. The metric name in the JSON
+3. The metric name to display in the report
+
+The first three values will be used to identify the metrics to report. 
+
+# Output Report
+
+The --output option species the path to the output file, by default 
+writing to standard output.  The output will be comma-delmited, and
+have columns for:
+- the metric group name
+- the metric category
+- the metric name
+- for each sample, the value of the metric
+
+"""
+
+parser = argparse.ArgumentParser(formatter_class=ArgParseFormatter, description=description)
+parser.add_argument('--input', help='The path to the input file.', required=True)
+parser.add_argument('--output', help='The path to the output file.', required=False)
+parser.add_argument('--report-defs', help="The path to the report definitions.", required=False, default=os.path.join(os.path.abspath(__file__), "resources", "report_defs.csv"))
+args = parser.parse_args()
+
+# Read in the JSON data
+with open(args.input, "r") as fh:
+    json_string = ""
+    for line in fh:
+        json_string += line
+    json_data = json.loads(json_string)
+
+# Read in the report definitions
+with open(args.report_defs, "r") as fh:
+    report_defs = []
+    for line in fh:
+        if line.startswith("#"):
+            continue
+        report_defs.append(line.rstrip("\r\n").split(","))
+
+# Go through the report defs and print the relevant metrics
+if args.output:
+    fh = open(args.output, "w")
+else:
+    fh = sys.stdout
+sample_names = list(json_data.keys())
+header = ["group", "category", "name"] + sample_names
+fh.write(",".join(header) + "\n")
+for report_def in report_defs:
+    group, category, name, display_name = report_def
+    values = [sample_data[group][category][name] for sample_data in json_data.values()]
+    values = [str(value) for value in values]
+    values = [group, category, display_name] + values
+    fh.write(",".join(values) + "\n")
+fh.close()

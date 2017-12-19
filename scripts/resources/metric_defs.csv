@@ -1,0 +1,11 @@
+Alignment Summary Metrics,.alignment_summary_metrics.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#AlignmentSummaryMetrics,CATEGORY
+Duplication Metrics (Pre-Mapping),.library_complexity.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#DuplicationMetrics,
+Duplication Metrics (Post-Mapping),.duplication_metrics.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#DuplicationMetrics,
+Error Summary Metrics,.error_summary_metrics.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#ErrorSummaryMetrics,SUBSTITUTION
+Gc Bias Detail Metrics,.gc_bias.detail_metrics.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#GcBiasDetailMetrics,GC
+Gc Bias Summary Metrics,.gc_bias.summary_metrics.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#GcBiasSummaryMetrics,
+Insert Size Metrics,.insert_size_metrics.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#InsertSizeMetrics,PAIR_ORIENTATION
+Sequencing Artifact Metrics - Bait Bias Summary Metrics,.bait_bias_summary_metrics.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#SequencingArtifactMetrics.BaitBiasSummaryMetrics,REF_BASE:ALT_BASE
+Sequencing Artifact Metrics - Pre Adapter Summary Metrics,.pre_adapter_summary_metrics.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#SequencingArtifactMetrics.PreAdapterSummaryMetrics,REF_BASE:ALT_BASE
+Quality Yield Metrics,.quality_yield_metrics.txt,http://broadinstitute.github.io/picard/picard-metric-definitions.html#CollectQualityYieldMetrics.QualityYieldMetrics,
+Sample Barcode Metrics,.demux_barcode_metrics.txt,http://fulcrumgenomics.github.io/fgbio/metrics/latest/#samplebarcodemetric,
