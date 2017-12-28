@@ -201,11 +201,13 @@ names of the metrics (a header row).
 
 """
 
+script_dir = os.path.abspath(os.path.dirname(__file__))
+
 parser = argparse.ArgumentParser(formatter_class=ArgParseFormatter, description=description)
 parser.add_argument('--output-dir', help='The path to the directory containing the metric files', required=True)
 parser.add_argument('--output-prefix', help='The path prefix for the output files', required=True)
 parser.add_argument('--metric-defs', help="The path to the metric definitions, comma-delimited.", required=False, 
-        default=os.path.join(os.path.abspath(__file__), "resources", "metric_defs.csv"))
+        default=os.path.join(script_dir, "resources", "metric_defs.csv"))
 parser.add_argument('--sample-names', help="The sample name; a sample's metric file will be <output-dir>/<sample-name><file-extension>", required=False, action="append", default=[])
 parser.add_argument('--demux-barcode-metrics', help="The path to the metrics file produced by fgbio's DemuxFastqs used to infer the sample prefixes.", required=False)
 args = parser.parse_args()
