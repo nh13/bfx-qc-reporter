@@ -8,18 +8,61 @@ If you say to yourself, "all I want to do is see some QC metrics for my samples"
 
 *** **This repository is under active development. Use at your own risk.** ***
 
-## Collating QC Metrics
+## Reporting QC Metrics
 
 The collation scripts are located in the `scripts` folder.
 
+### Collating QC metrics
+
 The `metrics2json.py` script will collate per-sample metric files into a single JSON file for consumption either by the user or by the `json2summaryreport.py` script. 
-The `metrics2json.py` assumes all sample-specific metric files live in a single directory, and that each metric file for each sample has the same metric extension. 
+Additionally, a flattened CSV file will also be created.
+All sample-specific metric files should live in a single directory, and that each metric file for each sample has the same metric extension. 
 For example, the metric file for Picard's [`AlignmentSummaryMetrics`](http://broadinstitute.github.io/picard/picard-metric-definitions.html#AlignmentSummaryMetrics) could be located in `<output-dir>/<sample-name>.alignment_summary_metrics.txt`.
-The file extension and metrics to be collated are user-configurable; run `metrics2json.py --help` for more information.
+The file extension and metrics to be collated are user-configurable with the `--metric-defs` option; run `metrics2json.py --help` for more information.
+
+#### Examples
+
+Specifying the name of each sample individually:
+
+```
+python scripts/metrics2json.py \
+    --output-dir <dir-with-metric-files> \
+    --output-prefix <output-path-prefix> \
+    --sample-names sample1 sample2 ... sampleN
+```
+
+Specifying the sample names using the output of [fgbio's](https://github.com/fulcrumgenomics/fgbio) [DemuxFastqs](fulcrumgenomics.github.io/fgbio/tools/latest/DemuxFastqs.html):
+
+```
+python scripts/metrics2json.py \
+    --output-dir <dir-with-metric-files> \
+    --output-prefix <output-path-prefix> \
+    --demux-barcode-metrics <path/to/demux_barcode_metrics.txt>
+```
+
+### Creating a Summary Report
 
 The `json2summaryreport.py` selects specific metrics from  the JSON output and reformats it into a comma-delimited file for downstream consumption.
 Run `json2summaryreport.py --help` for more information.
 
+#### Example
+
+Using the default metrics to report:
+
+```
+    python /Users/nhomer/git/nh13/bfx-qc-reporter/scripts/json2summaryreport.py \
+        --input </path/to/metrics.json> \
+        --output </path/to/summary.csv>;
+```
+
+Specifying a custom set of metrics to report in `report_defs.csv`:
+
+```
+    python /Users/nhomer/git/nh13/bfx-qc-reporter/scripts/json2summaryreport.py \
+        --input </path/to/metrics.json> \
+        --report-defs report_defs.csv \
+        --output </path/to/summary.csv>;
+```
 
 ## Browsing Metrics in Webpage
 
