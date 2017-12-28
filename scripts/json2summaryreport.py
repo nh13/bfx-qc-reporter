@@ -46,7 +46,7 @@ with open(args.input, "r") as fh:
     json_string = ""
     for line in fh:
         json_string += line
-    json_data = json.loads(json_string)
+    json_data = json.loads(json_string, object_pairs_hook=OrderedDict)
 
 # Read in the report definitions
 with open(args.report_defs, "r") as fh:
