@@ -9,6 +9,15 @@ import json
 from util.parser import *
 from util.util import fail
 
+ErrorIfWarning = False
+def warn(msg):
+    global ErrorIfWarning
+    if ErrorIfWarning:
+        sys.stderr.write(f"Error: {msg}\n")
+        sys.exit(1)
+    else:
+        sys.stderr.write(f"Warning: {msg}\n")
+
 def to_sample_names(path):
     """
     Infer the sample names and thus the sample file name prefix for all metrics
@@ -61,7 +70,7 @@ def to_dict_from_table(path, lines, category=None):
     try:
         header = [line.lower() for line in next(line_iter).split("\t")]
     except StopIteration:
-        sys.stderr.write(f"Warning: empty metric file: {path}\n")
+        warn(f"empty metric file: {path}")
         return OrderedDict()
     for line in line_iter:
         if not line:
@@ -105,7 +114,7 @@ def to_metric_dict(path, category=None):
     with open(path, "r") as fh:
         lines = [line.rstrip("\r\n") for line in fh]
         if len(lines) == 0:
-            sys.stderr.write(f"Warning: empty metric file: {path}\n")
+            warn(f"empty metric file: {path}")
             return OrderedDict()
         elif lines[0] == "## htsjdk.samtools.metrics.StringHeader":
             sys.stderr.write(f"Found Picard metric file: {path}\n")
@@ -210,10 +219,13 @@ parser.add_argument('--metric-defs', help="The path to the metric definitions, c
         default=os.path.join(script_dir, "resources", "metric_defs.csv"))
 parser.add_argument('--sample-names', help="The sample name; a sample's metric file will be <output-dir>/<sample-name><file-extension>", required=False, action="append", default=[])
 parser.add_argument('--demux-barcode-metrics', help="The path to the metrics file produced by fgbio's DemuxFastqs used to infer the sample prefixes.", required=False)
+parser.add_argument('--error-when-missing', help="Exit with an error if a missing metric file is found, otherwise warn.", required=False, action='store_true', default=False)
 args = parser.parse_args()
 
 if not os.path.isdir(args.output_dir):
     fail(f"--output was not a directory: '{args.output_dir}'")
+
+ErrorIfWarning = args.errorWhenMissing
 
 # Read in the metric defintions to print
 with open(args.metric_defs, "r") as fh:
@@ -261,7 +273,7 @@ for sample_name in sample_names: # for each sample
             # get the metrics for the given sample and metric definition
             sample_dict[metric_name] = to_metric_dict(path, metrics_category[metric_name])
         else:
-            sys.stderr.write(f"Warning: path does not exists for {metric_name}: {path}\n")
+            warn(f"path does not exists for {metric_name}: {path}")
             sample_dict[metric_name] = OrderedDict()
     # store the metrics for this sample
     metric_data[sample_name] = sample_dict
