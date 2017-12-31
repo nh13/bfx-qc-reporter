@@ -100,7 +100,6 @@ def main(args):
         else:
             for datum in csv_out:
                 fh.write(",".join(datum) + "\n")
-        fh.write(",".join(values) + "\n")
 
     # JSON otput
     fn_json = args.output_prefix + ".json" 
