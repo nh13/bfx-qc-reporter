@@ -8,24 +8,34 @@ If you say to yourself, "all I want to do is see some QC metrics for my samples"
 
 *** **This repository is under active development. Use at your own risk.** ***
 
+## Building and Running
+
+Python 3.6 or higher is required.
+
+To clone the repository: `git clone https://github.com/nh13/bfx-qc-reporter.git`.
+
+To install locally: `python setup.py install`.
+
+The tool-chain can be run with `bfx-qc-reporter`.
+
 ## Reporting QC Metrics
 
 The collation scripts are located in the `scripts` folder.
 
 ### Collating QC metrics
 
-The `metrics2json.py` script will collate per-sample metric files into a single JSON file for consumption either by the user or by the `json2summaryreport.py` script. 
+The `metrics2json` command will collate per-sample metric files into a single JSON file for consumption either by the user or by the `json2summaryreport` command. 
 Additionally, a flattened CSV file will also be created.
 All sample-specific metric files should live in a single directory, and that each metric file for each sample has the same metric extension. 
 For example, the metric file for Picard's [`AlignmentSummaryMetrics`](http://broadinstitute.github.io/picard/picard-metric-definitions.html#AlignmentSummaryMetrics) could be located in `<output-dir>/<sample-name>.alignment_summary_metrics.txt`.
-The file extension and metrics to be collated are user-configurable with the `--metric-defs` option; run `metrics2json.py --help` for more information.
+The file extension and metrics to be collated are user-configurable with the `--metric-defs` option; run `bfx-qc-reporter metrics2json --help` for more information.
 
 #### Examples
 
 Specifying the name of each sample individually:
 
 ```
-python scripts/metrics2json.py \
+python bfx-qc-reporter metrics2json \
     --output-dir <dir-with-metric-files> \
     --output-prefix <output-path-prefix> \
     --sample-names sample1 sample2 ... sampleN
@@ -34,7 +44,7 @@ python scripts/metrics2json.py \
 Specifying the sample names using the output of [fgbio's](https://github.com/fulcrumgenomics/fgbio) [DemuxFastqs](fulcrumgenomics.github.io/fgbio/tools/latest/DemuxFastqs.html):
 
 ```
-python scripts/metrics2json.py \
+python bfx-qc-reporter metrics2json \
     --output-dir <dir-with-metric-files> \
     --output-prefix <output-path-prefix> \
     --demux-barcode-metrics <path/to/demux_barcode_metrics.txt>
@@ -42,15 +52,15 @@ python scripts/metrics2json.py \
 
 ### Creating a Summary Report
 
-The `json2summaryreport.py` selects specific metrics from  the JSON output and reformats it into a comma-delimited file for downstream consumption.
-Run `json2summaryreport.py --help` for more information.
+The `json2summaryreport` command selects specific metrics from  the JSON output and reformats it into a comma-delimited file for downstream consumption.
+Run `bfx-qc-reporter json2summaryreport --help` for more information.
 
 #### Example
 
 Using the default metrics to report:
 
 ```
-    python /Users/nhomer/git/nh13/bfx-qc-reporter/scripts/json2summaryreport.py \
+    python bfx-qc-reporter json2summaryreport \
         --input </path/to/metrics.json> \
         --output </path/to/summary.csv>;
 ```
@@ -58,7 +68,7 @@ Using the default metrics to report:
 Specifying a custom set of metrics to report in `report_defs.csv`:
 
 ```
-    python /Users/nhomer/git/nh13/bfx-qc-reporter/scripts/json2summaryreport.py \
+    python bfx-qc-reporter json2summaryreport \
         --input </path/to/metrics.json> \
         --report-defs report_defs.csv \
         --output </path/to/summary.csv>;
@@ -66,7 +76,7 @@ Specifying a custom set of metrics to report in `report_defs.csv`:
 
 ## Browsing Metrics in Webpage
 
-The `web/index.html` webpage can be used to load the output of `metrics2json.py` to allow interactive browsing of metrics across one or more samples.
+The `src/html/index.html` webpage can be used to load the output of `metrics2json` to allow interactive browsing of metrics across one or more samples.
 The page also allows the user to sub-select the metrics to display.
 
 *** **This functionality is under active development.** ***
