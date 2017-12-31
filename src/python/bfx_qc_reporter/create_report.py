@@ -10,7 +10,7 @@ from .util.parser import *
 
 def add_subparser(subparsers):
     description="""
-    A tool to produce a summary report from a JSON produced by the load_metrics command.
+    Creates a summary CSV report from the output of the load-metrics command.
 
     # The Metrics to Report
 

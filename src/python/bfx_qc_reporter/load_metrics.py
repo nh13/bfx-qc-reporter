@@ -11,7 +11,7 @@ from .util.util import fail
 
 def add_subparser(subparsers):
     description="""
-    A tool to convert Picard and comma-separated per-sample metric files to JSON.
+    Parses various bioinformatic per-sample metric files to JSON and CSV.
 
     # Specifying Sample Names
 

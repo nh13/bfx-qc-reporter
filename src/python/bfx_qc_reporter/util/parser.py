@@ -6,7 +6,8 @@ import argparse
 
 def build_subparser(subparsers, source_file, description):
     name = os.path.basename(source_file[:-3]).replace("_", "-")
-    return subparsers.add_parser(name=name, description=description, formatter_class=ArgParseFormatter)
+    help = next(filter(lambda line: len(line) > 0, description.split("\n")))
+    return subparsers.add_parser(name=name, description=description, formatter_class=ArgParseFormatter, help=help)
 
 def fail_parser(parser, msg):
     """ Prints the help message, then the error message, then exits. """
