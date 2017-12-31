@@ -8,6 +8,7 @@ from collections import OrderedDict
 import json
 from .util.parser import *
 from .util.util import fail
+import importlib
 
 def add_subparser(subparsers):
     description="""
@@ -29,13 +30,22 @@ def add_subparser(subparsers):
     # Definining the Metrics to Collate
 
     The --metric-defs option gives the path to a comma-delimited file containing
-    four columns:
+    four columns with an optional fifth column:
 
     1. The unique name of the metric (ex. "Alignment Summary Metrics").
     2. The file extension for the metric (ex. ".alignment_summary_metrics.txt")
     3. Documentation for the metric (no commas) (ex. URL)
     4. If the metric file has more than one row, a colon-delimited list of 
        column names that uniquely identifies each row, otherwise blank.
+    5. A path to a python script used to transform the value.  The script should have one
+       method with signature 'transform(group, category, name, value)' and returns a
+       transformed value.  The parameters passed to 'transform' are as follows:
+         - group: gets the metric group
+         - category: gets the metric category, or None if not defined
+         - name: gets the metric name
+         - value: gets the metric value
+       If the script is not found at the given path, we attempt to find it in the same
+       directory as the metrics definition file.
 
     # Finding the Metric Files
 
@@ -226,35 +236,81 @@ def to_metric_dict(path, category=None):
             sys.stderr.write(f"Found tabular metric file: {path}\n")
             return to_dict_from_table(path, lines, category)
 
+class MetricsDef(object):
+
+    def __init__(self, name, file_extension, doc, categories, transform_script=None):
+        """
+        1. The unique name of the metric (ex. "Alignment Summary Metrics").
+        2. The file extension for the metric (ex. ".alignment_summary_metrics.txt")
+        3. Documentation for the metric (no commas) (ex. URL)
+        4. If the metric file has more than one row, a colon-delimited list of 
+           column names that uniquely identifies each row, otherwise blank.
+        5. A path to a python script used to transform the value.  The script should have one
+           method with signature 'transform(group, category, name, value)' and returns a
+           transformed value.  The parameters passed to 'transform' are as follows:
+			 - group: gets the metric group
+             - category: gets the metric category, or None if not defined
+             - name: gets the metric name
+             - value: gets the metric value
+           If the script is not found at the given path, we attempt to find it in the same
+           directory as the metrics definition file.
+        """
+        if "," in doc:
+            raise Exception(f"Metric '{name}' cannot have commas in its documentation: '{doc}'")
+        self.name             = name
+        self.file_extension   = file_extension
+        self.doc              = doc
+        self.categories       = categories
+        if transform_script:
+            name   = "custom_transform"
+            spec   = importlib.util.spec_from_file_location(name, transform_script)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            self.transform_func = module.transform
+        else:
+            self.transform_func = None 
+
+    def transform(self, group, category, name, value):
+        """
+        Transforms the metric value using the supplied transform method.
+        """
+        if self.transform_func:
+            return self.transform_func(group, category, name, value)
+        else:
+            return value
+
 def main(args):
 
     if not os.path.isdir(args.output_dir):
         fail(f"--output was not a directory: '{args.output_dir}'")
 
     __ErrorIfWarning = args.error_when_missing
-
+    
     # Read in the metric defintions to print
     with open(args.metric_defs, "r") as fh:
         metrics_defs = OrderedDict()
-        metrics_desc = OrderedDict()
-        metrics_category = OrderedDict()
         for line_index, line in enumerate(fh):
             tokens = line.rstrip("\r\n").split(",")
-            if len(tokens) != 4:
+            if len(tokens) != 4 and len(tokens) != 5:
                 line = line.rstrip("\r\n")
-                fail(f"Expected four values on line #{line_index+1}, found {len(tokens)}: '{line}'")
-            if tokens[0] in metrics_defs:
-                fail(f"Metric '{tokens[0]}' already defined on line #{line_index+1}")
-            metrics_defs[tokens[0]]     = tokens[1]
-            metrics_desc[tokens[0]]     = tokens[2]
-            metrics_category[tokens[0]] = tokens[3].lower().split(":") if tokens[3] else None
+                fail(f"Expected four or five values on line #{line_index+1}, found {len(tokens)}: '{line}'")
+            name               = tokens[0]
+            file_extension     = tokens[1]
+            doc                = tokens[2]
+            categories         = tokens[3].lower().split(":") if tokens[3] else None
+            transform_script   = tokens[4] if len(tokens) == 5 else None
+            if name in metrics_defs:
+                fail(f"Metric '{name}' already defined on line #{line_index+1}")
+            if transform_script and not os.path.exists(transform_script):
+                transform_script = os.path.join(os.path.dirname(args.metric_defs), transform_script)
+            metrics_defs[name] = MetricsDef(name=name, file_extension=file_extension, doc=doc, categories=categories, transform_script=transform_script)
 
     # Get the list of sample names
     if args.demux_barcode_metrics and args.sample_names:
         fail_parser(parser, "Both --demux-barcode-metrics and --sample-prefix cannot be given.")
     elif not args.demux_barcode_metrics and not args.sample_names:
         sample_names = []
-        metric_ext = next(iter(metrics_defs.values()))
+        metric_ext = next(iter([m.file_extension for m in metrics_defs.values()]))
         for fn in os.listdir(args.output_dir):
             path = os.path.join(args.output_dir, fn)
             if os.path.isfile(path) and path.endswith(metric_ext):
@@ -271,18 +327,27 @@ def main(args):
     metric_data = OrderedDict()
     for sample_name in sample_names: # for each sample
         assert not sample_name in metric_data
-        sample_dict = OrderedDict()
-        for metric_name, metric_ext in metrics_defs.items(): # for each metric definition
-            assert not metric_name in sample_dict
-            path = os.path.join(args.output_dir, sample_name + metric_ext)
+        sample_data = OrderedDict()
+        for metric_group_name, metrics_def in metrics_defs.items(): # for each metric definition
+            assert not metric_group_name in sample_data
+            path = os.path.join(args.output_dir, sample_name + metrics_def.file_extension)
             if os.path.isfile(path):
                 # get the metrics for the given sample and metric definition
-                sample_dict[metric_name] = to_metric_dict(path, metrics_category[metric_name])
+                sample_data[metric_group_name] = to_metric_dict(path, metrics_def.categories)
+                metrics_def = metrics_defs[metric_group_name]
+                # maybe transform the values
+                if metrics_def.transform_func:
+                    assert metric_group_name in sample_data
+                    for category, sample_category_dict in sample_data[metric_group_name].items():
+                        for metric_name , sample_name_dict in sample_category_dict.items():
+                            value = sample_data[metric_group_name][category][metric_name] 
+                            value = metrics_def.transform(metric_group_name, category, metric_group_name, value)
+                            sample_data[metric_group_name][category][metric_name] = value
             else:
-                warn(f"path does not exists for {metric_name}: {path}")
-                sample_dict[metric_name] = OrderedDict()
+                warn(f"path does not exists for {metric_group_name}: {path}")
+                sample_data[metric_group_name] = OrderedDict()
         # store the metrics for this sample
-        metric_data[sample_name] = sample_dict
+        metric_data[sample_name] = sample_data
 
     # Write it to JSON
     with open(args.output_prefix + ".json", "w") as fh:
@@ -299,13 +364,14 @@ def main(args):
         for metric_group_name, metric_group_data in metric_data[sample_names[0]].items():
             for category, metric_category_data in metric_group_data.items():
                 for metric_name in metric_category_data.keys():
+                    metrics_def = metrics_defs[metric_group_name]
                     def lookup(sample_data):
                         try:
                             return sample_data[metric_group_name][category][metric_name]
                         except KeyError:
                             return "Missing"
                     metric_values = [lookup(sample_data) for sample_data in metric_data.values()]
-                    items = [metric_group_name, category, metric_name] + metric_values + [metrics_defs[metric_group_name]]
+                    items = [metric_group_name, category, metric_name] + metric_values + [metrics_defs[metric_group_name].name]
                     items = [str(item) for item in items]
-                    items = items + [metrics_desc[metric_group_name]]
+                    items = items + [metrics_def.doc]
                     fh.write(",".join(items) + "\n")
