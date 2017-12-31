@@ -10,7 +10,7 @@ from .util.parser import *
 
 def add_subparser(subparsers):
     description="""
-    A tool to produce a summary report from a JSON produced by metrics2json.py.
+    A tool to produce a summary report from a JSON produced by the load_metrics command.
 
     # The Metrics to Report
 
@@ -34,7 +34,8 @@ def add_subparser(subparsers):
     - for each sample, the value of the metric
 
     """
-    parser = subparsers.add_parser(name=os.path.basename(__file__[:-3]), description=description, formatter_class=ArgParseFormatter)
+
+    parser = build_subparser(subparsers, source_file=__file__, description=description)
 
     parser.add_argument('--input', help='The path to the input file.', required=True)
     parser.add_argument('--output', help='The path to the output file.', required=False)

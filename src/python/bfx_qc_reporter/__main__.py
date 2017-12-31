@@ -1,8 +1,8 @@
 import sys
 import argparse
 from .util.parser import *
-from . import json2summaryreport
-from . import metrics2json
+from . import create_report
+from . import load_metrics
 
 def main(args=None):
     """The main routine."""
@@ -13,8 +13,8 @@ def main(args=None):
     subparsers.required = True
     
     # Add subparsers here
-    json2summaryreport.add_subparser(subparsers=subparsers)
-    metrics2json.add_subparser(subparsers=subparsers)
+    create_report.add_subparser(subparsers=subparsers)
+    load_metrics.add_subparser(subparsers=subparsers)
 
     args = parser.parse_args(args=args)
     args.func(args)

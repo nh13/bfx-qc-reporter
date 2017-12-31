@@ -96,9 +96,9 @@ def add_subparser(subparsers):
 
     """
 
-    parser = subparsers.add_parser(name=os.path.basename(__file__[:-3]), description=description, formatter_class=ArgParseFormatter)
+    parser = build_subparser(subparsers, source_file=__file__, description=description)
+    
     script_dir = os.path.abspath(os.path.dirname(__file__))
-
     parser.add_argument('--output-dir', help='The path to the directory containing the metric files', required=True)
     parser.add_argument('--output-prefix', help='The path prefix for the output files', required=True)
     parser.add_argument('--metric-defs', help="The path to the metric definitions, comma-delimited.", required=False, 
