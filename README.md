@@ -52,7 +52,8 @@ python bfx-qc-reporter load-metrics \
 
 ### Creating a Summary Report
 
-The `create-report` command selects specific metrics from  the JSON output and reformats it into a comma-delimited file for downstream consumption.
+The `create-report` command extracts specific metrics from the `load-metrics` JSON output and writes a JSON file with only those specific metrics.
+Additionally, a flattened CSV file will also be created.
 Run `bfx-qc-reporter create-report --help` for more information.
 
 #### Example
@@ -62,7 +63,7 @@ Using the default metrics to report:
 ```
     python bfx-qc-reporter create-report \
         --input </path/to/metrics.json> \
-        --output </path/to/summary.csv>;
+    	--output-prefix <output-path-prefix>;
 ```
 
 Specifying a custom set of metrics to report in `report_defs.csv`:
@@ -71,7 +72,7 @@ Specifying a custom set of metrics to report in `report_defs.csv`:
     python bfx-qc-reporter create-report \
         --input </path/to/metrics.json> \
         --report-defs report_defs.csv \
-        --output </path/to/summary.csv>;
+    	--output-prefix <output-path-prefix>;
 ```
 
 ## Browsing Metrics in Webpage
