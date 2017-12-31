@@ -103,7 +103,7 @@ def add_subparser(subparsers):
     parser.add_argument('--output-prefix', help='The path prefix for the output files', required=True)
     parser.add_argument('--metric-defs', help="The path to the metric definitions, comma-delimited.", required=False, 
             default=os.path.join(script_dir, "resources", "metric_defs.csv"))
-    parser.add_argument('--sample-names', help="The sample name; a sample's metric file will be <output-dir>/<sample-name><file-extension>", required=False, action="append", default=[])
+    parser.add_argument('--sample-names', help="The sample name; a sample's metric file will be <output-dir>/<sample-name><file-extension>", required=False, default=[], nargs='+')
     parser.add_argument('--demux-barcode-metrics', help="The path to the metrics file produced by fgbio's DemuxFastqs used to infer the sample prefixes.", required=False)
     parser.add_argument('--error-when-missing', help="Exit with an error if a missing metric file is found, otherwise warn.", required=False, action='store_true', default=False)
     parser.set_defaults(func=main)
