@@ -106,9 +106,9 @@ def add_subparser(subparsers):
     parser.add_argument('--sample-names', help="The sample name; a sample's metric file will be <output-dir>/<sample-name><file-extension>", required=False, action="append", default=[])
     parser.add_argument('--demux-barcode-metrics', help="The path to the metrics file produced by fgbio's DemuxFastqs used to infer the sample prefixes.", required=False)
     parser.add_argument('--error-when-missing', help="Exit with an error if a missing metric file is found, otherwise warn.", required=False, action='store_true', default=False)
+    parser.set_defaults(func=main)
 
     return parser
-
 
 
 __ErrorIfWarning = False
@@ -231,7 +231,7 @@ def main(args):
     if not os.path.isdir(args.output_dir):
         fail(f"--output was not a directory: '{args.output_dir}'")
 
-    __ErrorIfWarning = args.errorWhenMissing
+    __ErrorIfWarning = args.error_when_missing
 
     # Read in the metric defintions to print
     with open(args.metric_defs, "r") as fh:
