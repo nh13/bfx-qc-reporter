@@ -79,14 +79,19 @@ def main(args):
         # get the metric to report
         group, category, name, display_name = report_def
         # get the values for the CSV output
-        values = [sample_data[group][category][name] for sample_data in json_data.values()]
-        values = [str(value) for value in values]
+        def value_from(sample_data):
+            try:
+                return sample_data[group][category][name]
+            except KeyError:
+                return "Missing"
+        values = [value_from(sample_data) for sample_data in json_data.values()]
+        values = [str(value) for value in values if not values is None]
         values = [group, category, display_name] + values
         csv_out.append(values)
         # add the values for the JSON output
         for sample_name, sample_data in json_data.items():
             recursively_add(json_out[sample_name], group, category, name)
-            json_out[sample_name][group][category][name] = sample_data[group][category][name] 
+            json_out[sample_name][group][category][name] = value_from(sample_data)
 
     # CSV output
     fn_csv = args.output_prefix + ".csv" 
