@@ -18,6 +18,10 @@ To install locally: `python setup.py install`.
 
 The tool-chain can be run with `bfx-qc-reporter`.
 
+## Conda Recipe
+
+See the [conda-recipe](https://github.com/nh13/bfx-qc-reporter/tree/conda-recipe) branch.
+
 ## Reporting QC Metrics
 
 The collation scripts are located in the `scripts` folder.
