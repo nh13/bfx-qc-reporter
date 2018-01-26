@@ -10,6 +10,9 @@ package:
 build:
   number: 0
   skip: false
+  script: python setup.py install --single-version-externally-managed --record=record.txt
+  entry_points:
+    - bfx-qc-reporter=bfx_qc_reporter.__main__:main
 source:
   fn: {{ tag }}.tar.gz
   url: https://github.com/nh13/bfx-qc-reporter/archive/{{ tag }}.tar.gz
@@ -17,6 +20,7 @@ source:
 requirements:
   build:
     - python
+    - setuptools
   run:
     - python
 test:
