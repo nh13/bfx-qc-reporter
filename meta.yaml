@@ -1,0 +1,24 @@
+{% set version="0.0.1a" %}
+{% set tag="79f16c5" %}
+about:
+    home: https://github.com/nh13/bfx-qc-reporter
+    license: MIT
+    summary: Bioinformatics QC Reporting Tools.
+package:
+    name: bfx-qc-reporter
+    version: {{ version }}
+build:
+  number: 0
+  skip: false
+source:
+  fn: {{ tag }}.tar.gz
+  url: https://github.com/nh13/bfx-qc-reporter/archive/{{ tag }}.tar.gz
+  sha256: daa6d0ce9868af733d2cbe20f34bac1e8bbb563759f57a1bac34e46ad0e26f32
+requirements:
+  build:
+    - python
+  run:
+    - python
+test:
+  commands:
+    - 'bfx-qc-reporter 2>&1 | grep "^usage:"'
