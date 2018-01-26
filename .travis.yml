@@ -1,0 +1,4 @@
+# blocklist
+branches:
+  except:
+    conda-recipe
