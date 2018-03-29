@@ -23,6 +23,9 @@ def add_subparser(subparsers):
 
     The first three values will be used to identify the metrics to report. 
 
+    The category may be set to '*' if all categories should be output. 
+    This avoids having to list every category.
+
     # Output Report
 
     The --output-prefix option specifies the path prefix for the output 
@@ -78,20 +81,25 @@ def main(args):
     for report_def in report_defs:
         # get the metric to report
         group, category, name, display_name = report_def
-        # get the values for the CSV output
-        def value_from(sample_data):
-            try:
-                return sample_data[group][category][name]
-            except KeyError:
-                return "Missing"
-        values = [value_from(sample_data) for sample_data in json_data.values()]
-        values = [str(value) for value in values if not values is None]
-        values = [group, category, display_name] + values
-        csv_out.append(values)
-        # add the values for the JSON output
-        for sample_name, sample_data in json_data.items():
-            recursively_add(json_out[sample_name], group, category, name)
-            json_out[sample_name][group][category][name] = value_from(sample_data)
+        if category == '*':
+            categories = [c for c in sample_data[group].keys()]
+        else: 
+            categories = [category]
+        for category in categories:
+            # get the values for the CSV output
+            def value_from(sample_data):
+                try:
+                    return sample_data[group][category][name]
+                except KeyError:
+                    return "Missing"
+            values = [value_from(sample_data) for sample_data in json_data.values()]
+            values = [str(value) for value in values if not values is None]
+            values = [group, category, display_name] + values
+            csv_out.append(values)
+            # add the values for the JSON output
+            for sample_name, sample_data in json_data.items():
+                recursively_add(json_out[sample_name], group, category, name)
+                json_out[sample_name][group][category][name] = value_from(sample_data)
 
     # CSV output
     fn_csv = args.output_prefix + ".csv" 
