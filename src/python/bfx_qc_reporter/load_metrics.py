@@ -6,8 +6,8 @@ import re
 import argparse
 from collections import OrderedDict
 import json
-from .util.parser import *
-from .util.util import fail
+from bfx_qc_reporter.util.parser import *
+from bfx_qc_reporter.util.util import fail
 import importlib
 
 def add_subparser(subparsers):
@@ -116,6 +116,7 @@ def add_subparser(subparsers):
     parser.add_argument('--sample-names', help="The sample name; a sample's metric file will be <output-dir>/<sample-name><file-extension>", required=False, default=[], nargs='+')
     parser.add_argument('--demux-barcode-metrics', help="The path to the metrics file produced by fgbio's DemuxFastqs used to infer the sample prefixes.", required=False)
     parser.add_argument('--error-when-missing', help="Exit with an error if a missing metric file is found, otherwise warn.", required=False, action='store_true', default=False)
+    parser.add_argument('--with-sample-directories', help="The sample's metric file will be <output-dir>/<sample-name>/<sample-name><file-extension>", required=False, action='store_true', default=False)
     parser.set_defaults(func=main)
 
     return parser
@@ -279,7 +280,7 @@ class MetricsDef(object):
         else:
             return value
 
-def main(args):
+def main(parser, args):
 
     if not os.path.isdir(args.output_dir):
         fail(f"--output was not a directory: '{args.output_dir}'")
@@ -311,10 +312,21 @@ def main(args):
     elif not args.demux_barcode_metrics and not args.sample_names:
         sample_names = []
         metric_ext = next(iter([m.file_extension for m in metrics_defs.values()]))
-        for fn in os.listdir(args.output_dir):
-            path = os.path.join(args.output_dir, fn)
-            if os.path.isfile(path) and path.endswith(metric_ext):
-                sample_names.append(fn[:len(fn)-len(metric_ext)])
+        def add_sample_name_from_dir(dirname):
+            for fn in os.listdir(dirname):
+                path = os.path.join(dirname, fn)
+                if os.path.isfile(path) and path.endswith(metric_ext):
+                    sample_name = fn[:len(fn)-len(metric_ext)]
+                    if args.with_sample_directories and sample_name != os.path.basename(dirname):
+                        fail(f"Sample directory {os.path.basename(dirname)} did not match sample name {sample_name} from file.\n\tmetric file: {path}\n\tsample directory: {dirname}")
+                    sample_names.append(fn[:len(fn)-len(metric_ext)])
+        if args.with_sample_directories:
+            for dirname in os.listdir(args.output_dir):
+                dirname = os.path.join(args.output_dir, dirname)
+                if os.path.isdir(dirname):
+                    add_sample_name_from_dir(dirname)
+        else:
+            add_sample_name_from_dir(args.output_dir)
         if not sample_names: fail_parser(parser, f"No samples were found in the output directory: {args.output_dir}")
     elif args.demux_barcode_metrics:
         sample_names = to_sample_names(args.demux_barcode_metrics)
@@ -330,7 +342,8 @@ def main(args):
         sample_data = OrderedDict()
         for metric_group_name, metrics_def in metrics_defs.items(): # for each metric definition
             assert not metric_group_name in sample_data
-            path = os.path.join(args.output_dir, sample_name + metrics_def.file_extension)
+            sample_dir = os.path.join(args.output_dir, sample_name) if args.with_sample_directories else args.output_dir
+            path = os.path.join(sample_dir, sample_name + metrics_def.file_extension)
             if os.path.isfile(path):
                 # get the metrics for the given sample and metric definition
                 sample_data[metric_group_name] = to_metric_dict(path, metrics_def.categories)

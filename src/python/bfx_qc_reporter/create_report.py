@@ -6,7 +6,7 @@ import re
 import argparse
 from collections import OrderedDict
 import json
-from .util.parser import *
+from bfx_qc_reporter.util.parser import *
 
 def add_subparser(subparsers):
     description="""
@@ -49,7 +49,7 @@ def add_subparser(subparsers):
 
     return parser
 
-def main(args):
+def main(parser, args):
 
     # Read in the JSON data
     with open(args.input, "r") as fh:

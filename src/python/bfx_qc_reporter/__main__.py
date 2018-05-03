@@ -1,8 +1,8 @@
 import sys
 import argparse
-from .util.parser import *
-from . import create_report
-from . import load_metrics
+from bfx_qc_reporter.util.parser import *
+from bfx_qc_reporter import create_report
+from bfx_qc_reporter import load_metrics
 
 def main(args=None):
     """The main routine."""
@@ -17,7 +17,7 @@ def main(args=None):
     load_metrics.add_subparser(subparsers=subparsers)
 
     args = parser.parse_args(args=args)
-    args.func(args)
+    args.func(parser, args)
 
 
 if __name__ == "__main__":
