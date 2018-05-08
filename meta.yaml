@@ -1,5 +1,5 @@
-{% set version="0.0.1a" %}
-{% set tag="79f16c5" %}
+{% set version="0.0.1b" %}
+{% set tag="8bc171f" %}
 about:
     home: https://github.com/nh13/bfx-qc-reporter
     license: MIT
@@ -16,7 +16,7 @@ build:
 source:
   fn: {{ tag }}.tar.gz
   url: https://github.com/nh13/bfx-qc-reporter/archive/{{ tag }}.tar.gz
-  sha256: daa6d0ce9868af733d2cbe20f34bac1e8bbb563759f57a1bac34e46ad0e26f32
+  sha256: 692bb802a74afa9043c968fdce648a66d05f6f07c89be15b40c4af49f394bbb1
 requirements:
   build:
     - python
